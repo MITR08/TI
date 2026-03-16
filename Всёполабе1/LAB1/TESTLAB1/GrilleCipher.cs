@@ -15,11 +15,7 @@ namespace TESTLAB1
         /// <summary>Ячейки, заполненные на этом шаге (подсветка). null = не подсвечивать.</summary>
         public bool[,] HighlightCells { get; set; }
     }
-    /// <summary>
-    /// Шифр поворачивающейся решётки. Английский алфавит.
-    /// Решётка n×n; при повороте на 90° ячейки разбиваются на орбиты по 4 позиции.
-    /// В каждой орбите должно быть ровно одно отверстие.
-    /// </summary>
+
     public class GrilleCipher
     {
         private readonly int _n;
@@ -28,9 +24,6 @@ namespace TESTLAB1
         public int Size => _n;
         public bool[,] Holes => (bool[,])_holes.Clone();
 
-        /// <summary>
-        /// Возвращает ячейки орбиты для (r, c) при поворотах 0°, 90°, 180°, 270° (без дубликатов; центр 5×5 — одна ячейка).
-        /// </summary>
         public static List<Tuple<int, int>> GetOrbitCells(int n, int r, int c)
         {
             var set = new HashSet<Tuple<int, int>>();
@@ -46,18 +39,12 @@ namespace TESTLAB1
             return new List<Tuple<int, int>>(set);
         }
 
-        /// <summary>
-        /// Ожидаемое число отверстий: n²/4 для чётного n, (n²-1)/4+1 для нечётного (центр — отдельная орбита).
-        /// </summary>
         public static int ExpectedHoleCount(int n)
         {
             if (n % 2 == 0) return n * n / 4;
             return (n * n - 1) / 4 + 1;
         }
 
-        /// <summary>
-        /// Для нечётного n центр при повороте не двигается — в него пишем/читаем только один раз (при rot=0).
-        /// </summary>
         private static bool IsCenter(int n, int r, int c)
         {
             return n % 2 == 1 && r == n / 2 && c == n / 2;
@@ -70,9 +57,6 @@ namespace TESTLAB1
             _holes = (bool[,])holes.Clone();
         }
 
-        /// <summary>
-        /// Зашифровать: берём только английские буквы, записываем по отверстиям при 4 поворотах, остальное заполняем случайными буквами, читаем построчно.
-        /// </summary>
         public string Encrypt(string plainText)
         {
             string letters = Alphabets.FilterToAlphabet(plainText ?? "", Alphabets.English);
@@ -97,7 +81,7 @@ namespace TESTLAB1
                     for (int c = 0; c < _n; c++)
                     {
                         if (!h[r, c]) continue;
-                        if (IsCenter(_n, r, c) && rot > 0) continue; // центр только при rot=0
+                        if (IsCenter(_n, r, c) && rot > 0) continue;
                         matrix[r, c] = pos < letters.Length ? letters[pos] : Alphabets.English[random.Next(Alphabets.English.Length)];
                         pos++;
                     }
@@ -110,9 +94,60 @@ namespace TESTLAB1
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Зашифровать с пошаговыми данными: сначала все буквы, потом по шагам в отверстия, затем заполнение остальных случайными.
-        /// </summary>
+        public string Decrypt(string cipherText)
+        {
+            string letters = Alphabets.FilterToAlphabet(cipherText ?? "", Alphabets.English);
+            int cells = _n * _n;
+            if (letters.Length < cells) throw new ArgumentException("Недостаточно символов для расшифровки решётки этого размера.");
+
+            var matrix = new char[_n, _n];
+            int idx = 0;
+            for (int r = 0; r < _n; r++)
+                for (int c = 0; c < _n; c++)
+                    matrix[r, c] = letters[idx++];
+
+            var sb = new StringBuilder();
+            for (int rot = 0; rot < 4; rot++)
+            {
+                bool[,] h = RotateHoles(rot);
+                for (int r = 0; r < _n; r++)
+                    for (int c = 0; c < _n; c++)
+                    {
+                        if (!h[r, c]) continue;
+                        if (IsCenter(_n, r, c) && rot > 0) continue;
+                        sb.Append(matrix[r, c]);
+                    }
+            }
+            return sb.ToString();
+        }
+
+        private int CountHoles()
+        {
+            int k = 0;
+            for (int r = 0; r < _n; r++)
+                for (int c = 0; c < _n; c++)
+                    if (_holes[r, c]) k++;
+            return k;
+        }
+
+        private bool[,] RotateHoles(int rot)
+        {
+            bool[,] h = _holes;
+            for (int k = 0; k < rot; k++)
+                h = Rotate90CW(h);
+            return h;
+        }
+
+        private bool[,] Rotate90CW(bool[,] a)
+        {
+            int n = a.GetLength(0);
+            var b = new bool[n, n];
+            for (int r = 0; r < n; r++)
+                for (int c = 0; c < n; c++)
+                    b[c, n - 1 - r] = a[r, c];
+            return b;
+        }
+
         public Tuple<string, List<GrilleStep>> EncryptWithSteps(string plainText)
         {
             string letters = Alphabets.FilterToAlphabet(plainText ?? "", Alphabets.English);
@@ -196,9 +231,6 @@ namespace TESTLAB1
             return Tuple.Create(sb.ToString(), steps);
         }
 
-        /// <summary>
-        /// Расшифровать с пошаговыми данными.
-        /// </summary>
         public Tuple<string, List<GrilleStep>> DecryptWithSteps(string cipherText)
         {
             string letters = Alphabets.FilterToAlphabet(cipherText ?? "", Alphabets.English);
@@ -248,72 +280,6 @@ namespace TESTLAB1
                 LettersThisRound = plainBuilder.ToString()
             });
             return Tuple.Create(plainBuilder.ToString(), steps);
-        }
-
-        /// <summary>
-        /// Расшифровать: заполняем матрицу шифротекстом построчно, читаем по отверстиям при 4 поворотах — это открытый текст (только буквы).
-        /// </summary>
-        public string Decrypt(string cipherText)
-        {
-            string letters = Alphabets.FilterToAlphabet(cipherText ?? "", Alphabets.English);
-            int cells = _n * _n;
-            if (letters.Length < cells) throw new ArgumentException("Недостаточно символов для расшифровки решётки этого размера.");
-
-            var matrix = new char[_n, _n];
-            int idx = 0;
-            for (int r = 0; r < _n; r++)
-                for (int c = 0; c < _n; c++)
-                    matrix[r, c] = letters[idx++];
-
-            var sb = new StringBuilder();
-            for (int rot = 0; rot < 4; rot++)
-            {
-                bool[,] h = RotateHoles(rot);
-                for (int r = 0; r < _n; r++)
-                    for (int c = 0; c < _n; c++)
-                    {
-                        if (!h[r, c]) continue;
-                        if (IsCenter(_n, r, c) && rot > 0) continue; // центр читаем только при rot=0
-                        sb.Append(matrix[r, c]);
-                    }
-            }
-            return sb.ToString();
-        }
-
-        private int CountHoles()
-        {
-            int k = 0;
-            for (int r = 0; r < _n; r++)
-                for (int c = 0; c < _n; c++)
-                    if (_holes[r, c]) k++;
-            return k;
-        }
-
-        /// <summary>
-        /// Поворот решётки: rot=0 -> как есть, 1 -> 90°, 2 -> 180°, 3 -> 270°.
-        /// После поворота отверстие в (r,c) было в исходной решётке в определённой позиции.
-        /// Мы храним _holes в "исходном" виде; при rot=1 читаем так, как будто решётку повернули на 90° по часовой.
-        /// То есть при rot=1 ячейка (r,c) соответствует исходной (c, n-1-r).
-        /// При записи при rot=1 мы пишем в (r,c) — это та же физическая ячейка, что при rot=0 была в (c, n-1-r).
-        /// Поэтому для чтения при rot=1 нужно смотреть отверстия в исходной решётке: отверстие в (c, n-1-r) даёт ячейку (r,c).
-        /// То есть rotated[r,c] = _holes[c, n-1-r] для 90° CW.
-        /// </summary>
-        private bool[,] RotateHoles(int rot)
-        {
-            bool[,] h = _holes;
-            for (int k = 0; k < rot; k++)
-                h = Rotate90CW(h);
-            return h;
-        }
-
-        private bool[,] Rotate90CW(bool[,] a)
-        {
-            int n = a.GetLength(0);
-            var b = new bool[n, n];
-            for (int r = 0; r < n; r++)
-                for (int c = 0; c < n; c++)
-                    b[c, n - 1 - r] = a[r, c];
-            return b;
         }
     }
 }

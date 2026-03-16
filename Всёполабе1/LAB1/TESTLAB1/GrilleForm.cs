@@ -50,7 +50,7 @@ namespace TESTLAB1
             };
             for (int i = 3; i <= 10; i++)
                 _comboSize.Items.Add(i.ToString());
-            _comboSize.SelectedIndex = 1; // по умолчанию 4
+            _comboSize.SelectedIndex = 1;
             _comboSize.SelectedIndexChanged += ComboSize_SelectedIndexChanged;
 
             _lblKeyNote = new Label

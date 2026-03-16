@@ -11,9 +11,6 @@ namespace TESTLAB1
         public const string English = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const string Russian = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
 
-        /// <summary>
-        /// Оставляет в строке только буквы заданного алфавита (в верхнем регистре).
-        /// </summary>
         public static string FilterToAlphabet(string input, string alphabet)
         {
             if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(alphabet)) return "";
@@ -22,9 +19,6 @@ namespace TESTLAB1
             return new string(upper.Where(c => set.Contains(c)).ToArray());
         }
 
-        /// <summary>
-        /// Из ключа извлекает только символы заданного алфавита.
-        /// </summary>
         public static string SanitizeKey(string key, string alphabet)
         {
             return FilterToAlphabet(key ?? "", alphabet);

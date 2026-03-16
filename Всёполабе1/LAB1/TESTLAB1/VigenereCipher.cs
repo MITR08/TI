@@ -51,9 +51,40 @@ namespace TESTLAB1
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Пошаговые данные для шифрования или расшифрования.
-        /// </summary>
+        public string Encrypt(string plainText)
+        {
+            string letters = Alphabets.FilterToAlphabet(plainText ?? "", Alphabet);
+            return Transform(letters, true);
+        }
+
+        public string Decrypt(string cipherText)
+        {
+            string letters = Alphabets.FilterToAlphabet(cipherText ?? "", Alphabet);
+            return Transform(letters, false);
+        }
+
+        private string Transform(string text, bool encrypt)
+        {
+            if (string.IsNullOrEmpty(text)) return "";
+            var sb = new StringBuilder(text.Length);
+            int keyLen = _key.Length;
+            for (int i = 0; i < text.Length; i++)
+            {
+                int keyIndex = i % keyLen;
+                int shift = i / keyLen;
+                int ki = Alphabets.IndexInAlphabet(_key[keyIndex], Alphabet);
+                if (ki < 0) continue;
+                int keyCharIndex = (ki + shift) % N; // прогрессивный ключ
+                int pi = Alphabets.IndexInAlphabet(text[i], Alphabet);
+                if (pi < 0) continue;
+                int ci = encrypt
+                    ? (pi + keyCharIndex) % N
+                    : (pi - keyCharIndex + N) % N;
+                sb.Append(Alphabet[ci]);
+            }
+            return sb.ToString();
+        }
+
         public List<VigenereStep> GetSteps(string text, bool encrypt)
         {
             string letters = Alphabets.FilterToAlphabet(text ?? "", Alphabet);
@@ -75,46 +106,6 @@ namespace TESTLAB1
                 });
             }
             return steps;
-        }
-
-        /// <summary>
-        /// Зашифровать: только буквы русского алфавита, остальное игнорируется. Результат — только буквы.
-        /// </summary>
-        public string Encrypt(string plainText)
-        {
-            string letters = Alphabets.FilterToAlphabet(plainText ?? "", Alphabet);
-            return Transform(letters, true);
-        }
-
-        /// <summary>
-        /// Расшифровать.
-        /// </summary>
-        public string Decrypt(string cipherText)
-        {
-            string letters = Alphabets.FilterToAlphabet(cipherText ?? "", Alphabet);
-            return Transform(letters, false);
-        }
-
-        private string Transform(string text, bool encrypt)
-        {
-            if (string.IsNullOrEmpty(text)) return "";
-            var sb = new StringBuilder(text.Length);
-            int keyLen = _key.Length;
-            for (int i = 0; i < text.Length; i++)
-            {
-                int keyIndex = i % keyLen;
-                int shift = i / keyLen; // прогрессия: 0, 0, ..., 0, 1, 1, ..., 1, ...
-                int ki = Alphabets.IndexInAlphabet(_key[keyIndex], Alphabet);
-                if (ki < 0) continue;
-                int keyCharIndex = (ki + shift) % N; // прогрессивный ключ
-                int pi = Alphabets.IndexInAlphabet(text[i], Alphabet);
-                if (pi < 0) continue;
-                int ci = encrypt
-                    ? (pi + keyCharIndex) % N
-                    : (pi - keyCharIndex + N) % N;
-                sb.Append(Alphabet[ci]);
-            }
-            return sb.ToString();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace TESTLAB1
         public VigenereTableForm()
         {
             this.Text = "Таблица Виженера (русский алфавит) — для примера, расчёт по формуле";
-            this.ClientSize = new Size(720, 420);
+            this.ClientSize = new Size(800, 500);
             this.MinimumSize = new Size(400, 300);
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = Color.FromArgb(250, 252, 250);
@@ -30,8 +30,8 @@ namespace TESTLAB1
 
             var dgv = new DataGridView
             {
-                Location = new Point(12, 32),
-                Size = new Size(696, 360),
+                Location = new Point(20, 32),
+                Size = new Size(750, 360),
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
