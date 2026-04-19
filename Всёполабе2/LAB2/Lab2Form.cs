@@ -14,13 +14,11 @@ namespace LAB2
         public Lab2Form()
         {
             InitializeComponent();
-            // Твой вариант: степень многочлена 29
             _generator = new LFSR(29, "x^29+x^2+1");
         }
 
         private void txtState_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Разрешаем только 0/1 и управляющие клавиши (Backspace и т.п.)
             if (char.IsControl(e.KeyChar)) return;
             if (e.KeyChar != '0' && e.KeyChar != '1') e.Handled = true;
         }
@@ -108,11 +106,10 @@ namespace LAB2
                 rtbKey.Text = keyBinary;
                 rtbOutput.Text = resultBinary;
 
-                // сохранить зашифрованный/расшифрованный результат
+
                 _fileBytes = resultBytes;
                 btnSave.Enabled = true;
 
-                // восстановить состояние, чтобы следующий запуск начинался с тех же битов
                 _generator.SetRegisterState(state);
             }
             catch (Exception ex)
