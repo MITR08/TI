@@ -1,0 +1,218 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <SolidColorBrush x:Key="Ink" Color="#161311"/>
+  <SolidColorBrush x:Key="InkSoft" Color="#57534E"/>
+  <SolidColorBrush x:Key="Paper" Color="#FAF8F3"/>
+  <SolidColorBrush x:Key="PaperColumnA" Color="#F3EFE6"/>
+  <SolidColorBrush x:Key="PaperColumnB" Color="#EEEBE3"/>
+  <SolidColorBrush x:Key="PaperStripe" Color="#EDEADF"/>
+  <SolidColorBrush x:Key="CardFace" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="FieldSurface" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="OutputSurface" Color="#F9F8F6"/>
+  <SolidColorBrush x:Key="NavPanel" Color="#0F2744"/>
+  <SolidColorBrush x:Key="NavPanelDark" Color="#0A1829"/>
+  <SolidColorBrush x:Key="OnNav" Color="#FEFDFB"/>
+
+  <!-- Кнопки результата проверки (используются из C# через TryFindResource) -->
+  <SolidColorBrush x:Key="AccentSuccess" Color="#166534"/>
+  <SolidColorBrush x:Key="AccentDanger" Color="#B4233A"/>
+
+  <SolidColorBrush x:Key="Terracotta" Color="#BD4E2E"/>
+  <SolidColorBrush x:Key="TealAction" Color="#137A72"/>
+  <SolidColorBrush x:Key="PlumAction" Color="#6936D8"/>
+
+  <SolidColorBrush x:Key="DividerDry" Color="#D3CEC3"/>
+  <!-- Разделители как в прежнем ключе имён -->
+  <SolidColorBrush x:Key="HairlineBrush" Color="#D3CEC3"/>
+
+  <!-- Алиасы для совместимости с разметкой -->
+  <SolidColorBrush x:Key="FgMuted" Color="#57534E"/>
+
+  <!-- Подписи полей -->
+  <Style x:Key="CaptionLabel" TargetType="TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource InkSoft}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Margin" Value="0,0,0,6"/>
+    <Setter Property="FontSize" Value="12.5"/>
+  </Style>
+
+  <Style x:Key="LabelMuted" TargetType="TextBlock" BasedOn="{StaticResource CaptionLabel}"/>
+
+  <Style TargetType="{x:Type TextBox}">
+    <Setter Property="Background" Value="{StaticResource FieldSurface}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource DividerDry}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+    <Setter Property="Padding" Value="12,10"/>
+    <Setter Property="FontSize" Value="13.8"/>
+    <Setter Property="CaretBrush" Value="{StaticResource Ink}"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type TextBox}">
+          <Border x:Name="Root"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="6">
+            <ScrollViewer x:Name="PART_ContentHost"
+                          Margin="{TemplateBinding Padding}"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource Terracotta}"/>
+              <Setter TargetName="Root" Property="BorderThickness" Value="2"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="ReadOnlyOutput"
+         TargetType="TextBox"
+         BasedOn="{StaticResource {x:Type TextBox}}">
+    <Setter Property="IsReadOnly" Value="True"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property="AcceptsReturn" Value="True"/>
+    <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+    <Setter Property="MinHeight" Value="64"/>
+    <Setter Property="Background" Value="{StaticResource OutputSurface}"/>
+    <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Courier New"/>
+    <Setter Property="FontSize" Value="12.8"/>
+    <Setter Property="Padding" Value="12,11"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="BorderBrush" Value="{StaticResource DividerDry}"/>
+  </Style>
+
+  <!-- Основное действие: подписание -->
+  <Style x:Key="BtnPrimaryIndigo" TargetType="Button">
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="Background" Value="{StaticResource Terracotta}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Padding" Value="14,11"/>
+    <Setter Property="FontSize" Value="13.8"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="b"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="6"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="b" Property="Opacity" Value="0.93"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="b" Property="Opacity" Value="0.52"/>
+              <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Сохранение -->
+  <Style x:Key="BtnAccentGreen" TargetType="Button">
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="Background" Value="{StaticResource TealAction}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Padding" Value="14,11"/>
+    <Setter Property="FontSize" Value="13.8"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="b"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="6"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="b" Property="Opacity" Value="0.93"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="b" Property="Opacity" Value="0.48"/>
+              <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Проверка -->
+  <Style x:Key="BtnSecondaryPink" TargetType="Button">
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="Background" Value="{StaticResource PlumAction}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Padding" Value="14,11"/>
+    <Setter Property="FontSize" Value="13.8"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="b"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="6"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="b" Property="Opacity" Value="0.93"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="b" Property="Opacity" Value="0.52"/>
+              <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Выбор файла на светлом фоне -->
+  <Style x:Key="GhostButton" TargetType="Button">
+    <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+    <Setter Property="Background" Value="{StaticResource CardFace}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource DividerDry}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="12,8"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="g"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  Padding="{TemplateBinding Padding}"
+                  CornerRadius="6">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="g" Property="Background" Value="{StaticResource PaperStripe}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="g" Property="Opacity" Value="0.45"/>
+              <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

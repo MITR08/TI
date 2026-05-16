@@ -98,6 +98,7 @@ internal static class Crypto
         return t;
     }
 
+    // проверка на простоту
     internal static bool IsProbablePrime(BigInteger n)
     {
         if (n < 2)
@@ -190,26 +191,13 @@ internal static class Crypto
             throw new InvalidOperationException("p должно быть простым числом.");
         var (phi, primeFactors) = PrimitiveRootCandidates(p);
 
-        BigInteger? g0 = null;
+        var roots = new List<BigInteger>();
         for (var g = (BigInteger)2; g < p; g += 1)
         {
             if (IsPrimitiveRoot(g, p, phi, primeFactors))
-            {
-                g0 = g;
-                break;
-            }
+                roots.Add(g);
         }
-        if (g0 is null)
-            return [];
-
-        var roots = new List<BigInteger>();
-        for (BigInteger t = 1; t <= phi; t += 1)
-        {
-            if (Gcd(t, phi) == 1)
-                roots.Add(ModPow(g0.Value, t, p));
-        }
-        var uniq = roots.Select(r => r.ToString()).Distinct().Select(BigInteger.Parse).OrderBy(x => x).ToList();
-        return uniq;
+        return roots;
     }
 
     private static ushort BigIntegerToU16Checked(BigInteger x, string label)
@@ -284,8 +272,8 @@ internal static class Crypto
 
         if (!IsProbablePrime(p))
             throw new InvalidOperationException("p должно быть простым числом.");
-        if (p <= 257)
-            throw new InvalidOperationException("p должно быть > 257 (чтобы шифровать байты 0..255).");
+        if (p < 257)
+            throw new InvalidOperationException("p должно быть ≥ 257 (чтобы шифровать байты 0..255).");
         if (p > 65536)
             throw new InvalidOperationException("p должно быть ≤ 65536: a и b кодируются по 2 байта (0..65535).");
         if (x < 2 || x > p - 2)
@@ -350,8 +338,8 @@ internal static class Crypto
         var x = ParseDecimalStrict(xStr);
         if (!IsProbablePrime(p))
             throw new InvalidOperationException("p должно быть простым числом.");
-        if (p <= 257 || p > 65536)
-            throw new InvalidOperationException("p должно быть в диапазоне простых: > 257 и ≤ 65536 (формат 2 байта на число).");
+        if (p < 257 || p > 65536)
+            throw new InvalidOperationException("p должно быть в диапазоне простых: ≥ 257 и ≤ 65536 (формат 2 байта на число).");
         if (x < 2 || x > p - 2)
             throw new InvalidOperationException("x: по методичке 2 ≤ x ≤ p−2 (x ≠ 1).");
     }

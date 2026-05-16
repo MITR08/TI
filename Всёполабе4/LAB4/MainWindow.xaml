@@ -1,0 +1,368 @@
+﻿<Window x:Class="RsaSignatureLab.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="LAB4"
+        MinWidth="1060"
+        MinHeight="720"
+        Width="1190"
+        Height="798"
+        WindowStartupLocation="CenterScreen"
+        SnapsToDevicePixels="True"
+        Background="{StaticResource Paper}">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="274" MinWidth="252"/>
+      <ColumnDefinition Width="*" MinWidth="340"/>
+      <ColumnDefinition Width="*" MinWidth="340"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Параметры ключа (всегда слева) -->
+    <Grid Grid.Column="0">
+      <Grid.Background>
+        <LinearGradientBrush StartPoint="0.35,0" EndPoint="0.65,1">
+          <GradientStop Offset="0" Color="#1B4F8C"/>
+          <GradientStop Offset="0.55" Color="#102D53"/>
+          <GradientStop Offset="1" Color="#071627"/>
+        </LinearGradientBrush>
+      </Grid.Background>
+
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <StackPanel Grid.Row="0"
+                  Margin="24,36,24,16"
+                  TextBlock.Foreground="{StaticResource OnNav}"
+                  TextElement.Foreground="{StaticResource OnNav}">
+        <DockPanel LastChildFill="True">
+          <Border DockPanel.Dock="Left"
+                  Width="4"
+                  Margin="0,4,18,4"
+                  CornerRadius="2"
+                  Background="#FFD38A"/>
+          <StackPanel>
+            <TextBlock FontFamily="Georgia, serif"
+                       FontSize="12"
+                       Opacity="0.78"
+                       Text=""/>
+            <TextBlock FontFamily="Georgia, serif"
+                       FontSize="27"
+                       FontWeight="Bold"
+                       Margin="0,6,0,0"
+                       Text="ЭЦП RSA"/>
+            <TextBlock Margin="0,14,6,0"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       TextWrapping="Wrap"
+                       LineHeight="21"
+                       Opacity="0.92">
+              Хеш по формуле 3.2 -------- Hi = (Hi−1 + Mi) 2 mod n.
+            </TextBlock>
+          </StackPanel>
+        </DockPanel>
+      </StackPanel>
+
+      <ScrollViewer Grid.Row="1"
+                    VerticalScrollBarVisibility="Auto"
+                    Padding="0,4,0,10">
+        <Border Margin="22,6,22,10"
+                Background="{StaticResource CardFace}"
+                CornerRadius="12"
+                Padding="16,16"
+                BorderBrush="{StaticResource DividerDry}"
+                BorderThickness="1">
+          <Border.Effect>
+            <DropShadowEffect BlurRadius="14"
+                              ShadowDepth="2"
+                              Opacity="0.18"
+                              Color="#000"/>
+          </Border.Effect>
+          <StackPanel TextBlock.Foreground="{StaticResource Ink}"
+                      TextElement.Foreground="{StaticResource Ink}">
+            <TextBlock Style="{StaticResource CaptionLabel}">
+              Параметры (10 с.с.)
+            </TextBlock>
+            <TextBlock Margin="0,0,0,16"
+                       FontSize="11.3"
+                       Foreground="{StaticResource InkSoft}"
+                       TextWrapping="Wrap"
+                       LineHeight="16"
+                       Opacity="0.88">
+              Открытый ключ e вычисляется как - e ≡ d⁻¹ (mod φ(r)), ___________________ Ф. эйлера для r - φ(r) = (p−1)(q−1).
+            </TextBlock>
+
+            <TextBlock Style="{StaticResource CaptionLabel}" Text="p — простое, ≥ 3"/>
+            <TextBox x:Name="TxtP"
+                     Margin="0,0,0,12"
+                     TextChanged="DigitsField_OnTextChanged"
+                     ToolTip="p ≥ 3, простое; десятичная запись без пробелов"
+                     Padding="13,11"/>
+
+            <TextBlock Style="{StaticResource CaptionLabel}" Text="q — простое, ≠ p"/>
+            <TextBox x:Name="TxtQ"
+                     Margin="0,0,0,12"
+                     TextChanged="DigitsField_OnTextChanged"
+                     ToolTip="q ≥ 3, простое, отличное от p"
+                     Padding="13,11"/>
+
+            <TextBlock Style="{StaticResource CaptionLabel}" Text="d — закрытая экспонента"/>
+            <TextBox x:Name="TxtD"
+                     Margin="0,0,0,4"
+                     TextChanged="DigitsField_OnTextChanged"
+                     ToolTip="2 ≤ d &lt; φ(r), взаимно простое с φ(r)"
+                     Padding="13,11"/>
+          </StackPanel>
+        </Border>
+      </ScrollViewer>
+
+      <Border Grid.Row="2"
+              Margin="22,8,22,26"
+              Padding="14,14"
+              CornerRadius="10"
+              Background="#22000000"
+              BorderBrush="#35FFFFFF"
+              BorderThickness="1">
+        <TextBlock TextWrapping="Wrap"
+                   LineHeight="17"
+                   FontSize="11"
+                   Foreground="{StaticResource OnNav}"
+                   Opacity="0.9">
+          <Run FontWeight="SemiBold">Буквы в тексте:</Run>
+          кириллица А…Я → 1…33; латиница A…Z → код ASCII заглавной буквы (65…90); прочие символы — Unicode.
+        </TextBlock>
+      </Border>
+    </Grid>
+
+    <!-- Подписание -->
+    <Border Grid.Column="1"
+            Margin="19,26,12,29"
+            Background="{StaticResource PaperColumnA}">
+      <Grid Margin="24,24,24,22">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                CornerRadius="8"
+                Padding="16,14"
+                Margin="0,0,0,20"
+                Background="{StaticResource Terracotta}">
+          <DockPanel LastChildFill="True">
+            <TextBlock DockPanel.Dock="Left"
+                       FontFamily="Georgia, serif"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Foreground="#FFF5EF"
+                       Opacity="0.45"
+                       Margin="0,-2,14,0"
+                       Text="I"/>
+            <StackPanel>
+              <TextBlock FontSize="15"
+                         FontWeight="Bold"
+                         Foreground="White"
+                         Text="Формирование подписи"/>
+              <TextBlock Margin="0,4,0,0"
+                         FontSize="11.5"
+                         Foreground="#FFF1E8"
+                         TextWrapping="Wrap"
+                         Opacity="0.95"
+                         Text="Файл → хеш h(M) → S = h(M)^d mod r"/>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="0,2,6,18">
+            <DockPanel LastChildFill="True" Margin="0,0,0,14">
+              <Button x:Name="BtnBrowseSign"
+                      DockPanel.Dock="Left"
+                      Content="Файл…"
+                      Width="112"
+                      Style="{StaticResource GhostButton}"
+                      Margin="0,0,12,0"
+                      Click="BtnBrowseSign_OnClick"/>
+              <TextBox x:Name="TxtSignPath"
+                       MinHeight="42"
+                       IsReadOnly="True"
+                       VerticalContentAlignment="Center"
+                       Padding="14,11"
+                       Text="не выбран"
+                       Background="{StaticResource CardFace}"/>
+            </DockPanel>
+
+            <Button x:Name="BtnSign"
+                    Content="Сформировать хеш и подпись"
+                    Style="{StaticResource BtnPrimaryIndigo}"
+                    Margin="0,6,0,0"
+                    Click="BtnSign_OnClick"/>
+
+            <StackPanel x:Name="SigningOutputPanel"
+                        Margin="0,26,10,26"
+                        Visibility="Collapsed">
+
+              <Separator Margin="0,22,0,22" Background="{StaticResource DividerDry}"/>
+
+              <TextBlock Style="{StaticResource CaptionLabel}">
+                Открытая экспонента e (10-я с.с.)
+              </TextBlock>
+              <TextBox x:Name="TxtE"
+                       Style="{StaticResource ReadOnlyOutput}"
+                       Margin="0,6,0,18"
+                       MinHeight="72"/>
+
+              <TextBlock Style="{StaticResource CaptionLabel}">
+                Хеш сообщения h(M) (10-я с.с.)
+              </TextBlock>
+              <TextBox x:Name="TxtHash"
+                       Style="{StaticResource ReadOnlyOutput}"
+                       Margin="0,6,0,18"
+                       MinHeight="88"/>
+
+              <TextBlock Style="{StaticResource CaptionLabel}">
+                ЭЦП S (10-я с.с.)
+              </TextBlock>
+              <TextBox x:Name="TxtSignature"
+                       Style="{StaticResource ReadOnlyOutput}"
+                       Margin="0,6,0,20"
+                       MinHeight="88"/>
+
+              <Button x:Name="BtnSaveSigned"
+                      Content="Сохранить: текст сообщения и подпись в конце"
+                      Style="{StaticResource BtnAccentGreen}"
+                      Margin="0,10,0,8"
+                      IsEnabled="False"
+                      Click="BtnSaveSigned_OnClick"/>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <!-- Проверка -->
+    <Border Grid.Column="2"
+            Margin="12,26,26,29"
+            Background="{StaticResource PaperColumnB}">
+      <Grid Margin="24,24,24,22">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                CornerRadius="8"
+                Padding="16,14"
+                Margin="0,0,0,22"
+                Background="{StaticResource PlumAction}">
+          <DockPanel LastChildFill="True">
+            <TextBlock DockPanel.Dock="Left"
+                       FontFamily="Georgia, serif"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Foreground="#F4EEFF"
+                       Opacity="0.45"
+                       Margin="0,-2,13,0"
+                       Text="II"/>
+            <StackPanel>
+              <TextBlock FontSize="15"
+                         FontWeight="Bold"
+                         Foreground="White"
+                         Text="Проверка подписи"/>
+              <TextBlock Margin="0,4,8,0"
+                         FontSize="11.6"
+                         Foreground="#F1ECFF"
+                         TextWrapping="Wrap"
+                         Opacity="0.95"
+                         Text="Сравним h(M′) mod r с S в степени e по модулю r при тех же ключах."/>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="2,6,6,26">
+            <DockPanel Margin="0,0,0,14" LastChildFill="True">
+              <Button x:Name="BtnBrowseVerify"
+                      DockPanel.Dock="Left"
+                      Content="Файл…"
+                      Width="112"
+                      Style="{StaticResource GhostButton}"
+                      Margin="0,0,12,0"
+                      Click="BtnBrowseVerify_OnClick"/>
+              <TextBox x:Name="TxtVerifyPath"
+                       MinHeight="42"
+                       IsReadOnly="True"
+                       VerticalContentAlignment="Center"
+                       Padding="14,11"
+                       Text="не выбран"
+                       Background="{StaticResource CardFace}"/>
+            </DockPanel>
+
+            <Button x:Name="BtnVerify"
+                    Content="Проверить подпись файла"
+                    Style="{StaticResource BtnSecondaryPink}"
+                    Margin="0,6,0,0"
+                    Click="BtnVerify_OnClick"/>
+
+            <StackPanel x:Name="VerificationPanel"
+                        Margin="0,28,4,38"
+                        Visibility="Collapsed">
+
+              <Separator Margin="0,0,0,20" Background="{StaticResource DividerDry}"/>
+
+              <TextBlock x:Name="VerifyTitle"
+                         FontFamily="Georgia, serif"
+                         FontWeight="Bold"
+                         FontSize="22"
+                         Margin="2,6,18,18"/>
+
+              <Border x:Name="VerifyExplanationCard"
+                      CornerRadius="10"
+                      BorderBrush="#D8CFFA"
+                      BorderThickness="1"
+                      Padding="16,14"
+                      Margin="0,0,0,22"
+                      Background="#FBFAFF">
+                <TextBlock x:Name="TxtVerifyExplanation"
+                           TextWrapping="Wrap"
+                           LineHeight="21"
+                           Foreground="{StaticResource InkSoft}"
+                           FontSize="13.2"/>
+              </Border>
+
+              <StackPanel x:Name="VerifyFigures">
+                <TextBlock Style="{StaticResource CaptionLabel}"
+                           Text="r = p·q (модуль RSA)"/>
+                <TextBox x:Name="TxtVerifyR"
+                         Style="{StaticResource ReadOnlyOutput}"
+                         Margin="0,4,0,16"/>
+
+                <TextBlock Style="{StaticResource CaptionLabel}"
+                           Text="h(M′) — хеш восстановленного сообщения (10-я с.с.)"/>
+                <TextBox x:Name="TxtVerifyMPrime"
+                         Style="{StaticResource ReadOnlyOutput}"
+                         Margin="0,4,0,16"/>
+
+                <TextBlock Style="{StaticResource CaptionLabel}"
+                           Text="S^e mod r — извлечено из подписи"/>
+                <TextBox x:Name="TxtVerifyFromSig"
+                         Style="{StaticResource ReadOnlyOutput}"
+                         Margin="0,4,0,16"/>
+
+                <TextBlock Style="{StaticResource CaptionLabel}"
+                           Text="Подпись S из файла"/>
+                <TextBox x:Name="TxtVerifyS"
+                         Style="{StaticResource ReadOnlyOutput}"
+                         Margin="0,4,0,6"/>
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

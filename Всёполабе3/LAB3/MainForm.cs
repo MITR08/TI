@@ -10,6 +10,47 @@ public partial class MainForm : Form
     public MainForm()
     {
         InitializeComponent();
+        AttachDigitsOnly(txtP, txtX, txtK);
+    }
+
+    private static void AttachDigitsOnly(params TextBox[] boxes)
+    {
+        foreach (var tb in boxes)
+        {
+            tb.KeyPress += DigitsOnly_KeyPress;
+            tb.TextChanged += DigitsOnly_TextChanged;
+        }
+    }
+
+    private static void DigitsOnly_KeyPress(object? sender, KeyPressEventArgs e)
+    {
+        if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            e.Handled = true;
+    }
+
+    private static void DigitsOnly_TextChanged(object? sender, EventArgs e)
+    {
+        if (sender is not TextBox tb)
+            return;
+        var old = tb.Text;
+        var sel = tb.SelectionStart;
+        var sb = new System.Text.StringBuilder(old.Length);
+        var newSel = 0;
+        for (var i = 0; i < old.Length; i++)
+        {
+            var c = old[i];
+            if (char.IsDigit(c))
+            {
+                sb.Append(c);
+                if (i < sel)
+                    newSel++;
+            }
+        }
+        var only = sb.ToString();
+        if (only == old)
+            return;
+        tb.Text = only;
+        tb.SelectionStart = Math.Min(newSel, only.Length);
     }
 
     private async void BtnFindRoots_Click(object? sender, EventArgs e)
