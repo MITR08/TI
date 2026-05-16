@@ -9,9 +9,6 @@ public sealed record SplitSignedTextResult(string Message, BigInteger Signature)
 
 public sealed record RsaValidatedParams(BigInteger P, BigInteger Q, BigInteger D, BigInteger R, BigInteger Phi, BigInteger E);
 
-/// <summary>
-/// Логика ЭЦП RSA и хеша по условию (H₀ = 100, модуль n = r = p·q), перенесённая без изменений с веб-версии.
-/// </summary>
 public static class RsaCrypto
 {
     private static readonly BigInteger H0 = 100;
@@ -250,7 +247,6 @@ public static class RsaCrypto
         return new SplitSignedTextResult(message, BigInteger.Parse(last, CultureInfo.InvariantCulture));
     }
 
-    /// <returns>Вычисленная подпись S и промежуточные значения.</returns>
     public static (BigInteger S, BigInteger M, BigInteger MSign, BigInteger RecoveredCheck) ComputeSignature(string text, RsaValidatedParams p)
     {
         var r = p.R;
@@ -270,7 +266,7 @@ public static class RsaCrypto
         return (s, m, mSign, recovered);
     }
 
-    /// <returns>Объяснение и числовые столбцы для интерфейса.</returns>
+
     public static VerifiedBundle VerifySignedFile(string signedFileContent, RsaValidatedParams p)
     {
         var full = signedFileContent;
